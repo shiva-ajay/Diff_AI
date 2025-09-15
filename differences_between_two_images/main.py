@@ -45,12 +45,21 @@ logger = logging.getLogger(__name__)
     default=False,
     help="Highlight the mask by drawing them",
 )
+@click.option(
+    "-p",
+    "--popup",
+    is_flag=True,
+    type=bool,
+    default=False,
+    help="Display result images in popup windows",
+)
 @click.argument("images", nargs=-1, type=click.Path(exists=True))
 def main(  # pylint: disable=too-many-locals
     display_ssim: bool,
     bound_differences: bool,
     draw_differences: bool,
     draw_mask: bool,
+    popup: bool,
     images: list[str],
 ) -> None:
     """
@@ -60,6 +69,7 @@ def main(  # pylint: disable=too-many-locals
         bound_differences (bool): flag to circle the differences and save the result.
         draw_differences (bool): flag to draw the differences and save the result.
         draw_mask (bool): flag to draw the mask from the difference and save the result.
+        popup (bool): flag to display result images in popup windows.
         images (list): list of images to compared.
     Returns:
         None
@@ -107,17 +117,33 @@ def main(  # pylint: disable=too-many-locals
 
         if draw_mask:
             utils.imgsave(f"mask-between-{reference_name}-and-{name}.jpg", mask)
+            if popup:
+                cv2.imshow(f"Mask: {reference_name} vs {name}", mask)
+                
         if bound_differences:
             utils.imgsave(
                 f"bound-differences-between-{reference_name}-and-{name}-on-{name}.jpg",
                 frame,
             )
+            if popup:
+                cv2.imshow(f"Bounded Differences: {reference_name} vs {name}", frame)
+                
         if draw_differences:
             utils.imgsave(
                 f"draw-differences-between-{reference_name}-and-{name}-on-{name}.jpg",
                 frame_filled_after,
             )
-
+            if popup:
+                cv2.imshow(f"Drawn Differences: {reference_name} vs {name}", frame_filled_after)
+                
+        if display_ssim and popup:
+            cv2.imshow(f"SSIM Difference: {reference_name} vs {name}", thresh)
+            
+    # Wait for key press if popup windows are displayed
+    if popup and any([display_ssim, bound_differences, draw_differences, draw_mask]):
+        print("\nPress any key in the image windows to close them...")
+        cv2.waitKey(0)
+        
     cv2.destroyAllWindows()
 
 
