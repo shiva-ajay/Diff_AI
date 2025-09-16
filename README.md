@@ -52,39 +52,7 @@ Then, just install the different dependencies:
 
 5. Click "Find Differences" to see the analysis results
 
-### Command Line Interface
 
-Once the virtual environment is set up, you can use the original CLI:
-
-On MacOS:
-
-```bash
-poetry run main -bd -dd -dm -ds image1.jpg image2.jpg
-```
-
-On Windows PowerShell:
-
-```bash
-poetry run main -bd -dd -dm -ds image1.jpg image2.jpg
-```
-
-**CLI Options:**
-
-- `-dm` / `--draw-mask`: Generate mask differences
-- `-bd` / `--bound-differences`: Highlight differences with rectangles
-- `-dd` / `--draw-differences`: Fill and highlight differences
-- `-ds` / `--display-ssim`: Show SSIM difference analysis
-- `-p` / `--popup`: Display results in popup windows
-
-**Notes:**
-
-- The first image is used as the reference for comparison
-- Results are saved in the `results/` folder
-- Web interface provides all visualization types automatically
-
-### Example
-
-    poetry run main -bd -dd -dm -ds dataset/image-1.jpg dataset/image-2.jpg
 
 ## 🏗️ Web Application Architecture
 
