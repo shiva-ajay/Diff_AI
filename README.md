@@ -77,31 +77,7 @@ The web application consists of:
 - `POST /compare-images`: Main image comparison endpoint
 - `GET /results/{filename}`: Serves generated result images
 
-## Back-end logic explained
 
-Let's take the following images:
-
-![](sprites/image-1.jpg)
-
-and:
-
-![](sprites/image-2.jpg)
-
-The first step to do is to compute the ssim difference after having had converted the images from colorized to gray-scaled:
-
-![](sprites/ssim.jpg)
-
-Then, we isolate the differences by binarizing the image:
-
-![](sprites/differences.jpg)
-
-Then, we remove the noise by applying a mask and removing the outliers i.e. the freckles for which the surface is inferior to an arbitrary number:
-
-![](sprites/mask.jpg)
-
-Finally, we compute the bouding box for each surface and superpose it to the image:
-
-![](sprites/boxed.jpg)
 
 ## Troubleshooting
 
