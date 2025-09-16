@@ -33,11 +33,14 @@ RUN poetry config virtualenvs.in-project false
 # Copy poetry files
 COPY pyproject.toml poetry.lock* ./
 
-# Install dependencies (using newer Poetry syntax)
-RUN poetry install --only=main --no-interaction --no-ansi
+# Install dependencies only (no local package)
+RUN poetry install --only=main --no-interaction --no-ansi --no-root
 
 # Copy project files
 COPY . .
+
+# Install the local package
+RUN poetry install --only-root --no-interaction --no-ansi
 
 # Create necessary directories
 RUN mkdir -p results static
@@ -57,4 +60,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 
 # Run the application
 CMD ["env", "PYTHONDONTWRITEBYTECODE=1", "PYTHONUNBUFFERED=1", "PYTHONPATH=/app", "python", "app.py"]
+
 
