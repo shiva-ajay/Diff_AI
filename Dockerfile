@@ -1,64 +1,30 @@
-# Use Python 3.10 slim image
-FROM python:3.10-slim
+# Use Python 3.10 slim as base image for smaller size
+FROM python:3.10-slim as builder
 
-# Install system dependencies required for OpenCV and other packages
-RUN apt-get update && apt-get install -y \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
-    libgtk-3-0 \
-    libavcodec-dev \
-    libavformat-dev \
-    libswscale-dev \
-    libgl1-mesa-dev \
-    libglib2.0-dev \
-    libgthread-2.0-0 \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set work directory
+# Set working directory
 WORKDIR /app
 
-# Install Poetry
-RUN pip install --upgrade pip
-RUN pip install poetry
+# Install system dependencies required for OpenCV
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Configure Poetry
-RUN poetry config virtualenvs.create false
-RUN poetry config virtualenvs.in-project false
+# Copy requirements file
+COPY requirements.txt .
 
-# Copy poetry files
-COPY pyproject.toml poetry.lock* ./
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies only (no local package)
-RUN poetry install --only=main --no-interaction --no-ansi --no-root
-
-# Copy project files
+# Copy the rest of the application
 COPY . .
 
-# Install the local package
-RUN poetry install --only-root --no-interaction --no-ansi
-
-# Create necessary directories
-RUN mkdir -p results static
-RUN chmod 755 results static
-
-# Create non-root user for security
-RUN adduser --disabled-password --gecos '' --uid 1000 appuser
-RUN chown -R appuser:appuser /app
-USER appuser
-
-# Expose port
+# Expose port 8000
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
-# Run the application
-CMD ["env", "PYTHONDONTWRITEBYTECODE=1", "PYTHONUNBUFFERED=1", "PYTHONPATH=/app", "python", "app.py"]
-
-
+# Command to run the application
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
