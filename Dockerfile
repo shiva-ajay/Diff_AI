@@ -13,14 +13,15 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libglib2.0-0 \
     libgtk-3-0 \
     libavcodec-dev \
     libavformat-dev \
     libswscale-dev \
-    libgl1-mesa-glx \
+    libgl1-mesa-dev \
+    libglib2.0-dev \
     libgthread-2.0-0 \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Set work directory
