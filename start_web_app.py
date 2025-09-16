@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 
-def main():
+def main() -> None:
     """Start the P&ID Diff Finder web application."""
     print("🚀 Starting P&ID Diff Finder Web Application...")
     print("=" * 50)
@@ -49,7 +49,7 @@ def main():
         # Give the server a moment to start
         import threading
 
-        def open_browser():
+        def open_browser() -> None:
             time.sleep(3)  # Wait 3 seconds for server to start
             webbrowser.open("http://localhost:8000")
 

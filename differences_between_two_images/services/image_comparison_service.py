@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class ImageComparisonService:
     """Service class for handling image comparison operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the service with results directory."""
         self.results_dir = Path(settings.PATH_RESULTS)
         self.results_dir.mkdir(exist_ok=True)

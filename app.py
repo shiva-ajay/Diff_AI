@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Any
 import uvicorn
 from fastapi import FastAPI, File, UploadFile, HTTPException, Request
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -48,7 +48,7 @@ MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 
 
 @app.get("/", response_class=HTMLResponse)
-async def root():
+async def root() -> HTMLResponse:
     """Serve the main HTML page."""
     try:
         html_path = Path("static/index.html")
@@ -157,7 +157,7 @@ async def compare_images(
 
 
 @app.get("/results/{filename}")
-async def get_result_file(filename: str):
+async def get_result_file(filename: str) -> FileResponse:
     """
     Serve result image files.
 
@@ -188,7 +188,7 @@ async def get_result_file(filename: str):
 
 
 @app.exception_handler(404)
-async def not_found_handler(request: Request, exc: HTTPException):
+async def not_found_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """Custom 404 handler."""
     from fastapi.responses import JSONResponse
 
@@ -196,7 +196,7 @@ async def not_found_handler(request: Request, exc: HTTPException):
 
 
 @app.exception_handler(500)
-async def internal_error_handler(request: Request, exc: HTTPException):
+async def internal_error_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """Custom 500 handler."""
     from fastapi.responses import JSONResponse
 
