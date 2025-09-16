@@ -1,11 +1,6 @@
 # Use Python 3.10 slim image
 FROM python:3.10-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
-
 # Install system dependencies required for OpenCV and other packages
 RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
@@ -38,8 +33,8 @@ RUN poetry config virtualenvs.in-project false
 # Copy poetry files
 COPY pyproject.toml poetry.lock* ./
 
-# Install dependencies
-RUN poetry install --no-dev --no-interaction --no-ansi
+# Install dependencies (using newer Poetry syntax)
+RUN poetry install --only=main --no-interaction --no-ansi
 
 # Copy project files
 COPY . .
@@ -61,4 +56,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Run the application
-CMD ["python", "app.py"]
+CMD ["env", "PYTHONDONTWRITEBYTECODE=1", "PYTHONUNBUFFERED=1", "PYTHONPATH=/app", "python", "app.py"]
+
