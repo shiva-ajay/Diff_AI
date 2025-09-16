@@ -119,7 +119,7 @@ def main(  # pylint: disable=too-many-locals
             utils.imgsave(f"mask-between-{reference_name}-and-{name}.jpg", mask)
             if popup:
                 cv2.imshow(f"Mask: {reference_name} vs {name}", mask)
-                
+
         if bound_differences:
             utils.imgsave(
                 f"bound-differences-between-{reference_name}-and-{name}-on-{name}.jpg",
@@ -127,23 +127,25 @@ def main(  # pylint: disable=too-many-locals
             )
             if popup:
                 cv2.imshow(f"Bounded Differences: {reference_name} vs {name}", frame)
-                
+
         if draw_differences:
             utils.imgsave(
                 f"draw-differences-between-{reference_name}-and-{name}-on-{name}.jpg",
                 frame_filled_after,
             )
             if popup:
-                cv2.imshow(f"Drawn Differences: {reference_name} vs {name}", frame_filled_after)
-                
+                cv2.imshow(
+                    f"Drawn Differences: {reference_name} vs {name}", frame_filled_after
+                )
+
         if display_ssim and popup:
             cv2.imshow(f"SSIM Difference: {reference_name} vs {name}", thresh)
-            
+
     # Wait for key press if popup windows are displayed
     if popup and any([display_ssim, bound_differences, draw_differences, draw_mask]):
         print("\nPress any key in the image windows to close them...")
         cv2.waitKey(0)
-        
+
     cv2.destroyAllWindows()
 
 

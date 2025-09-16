@@ -113,19 +113,25 @@ def compute_ssim(image_1: np.ndarray, image_2: np.ndarray) -> tuple[float, np.nd
     return score, diff
 
 
-def compute_ssim_memory_efficient(image_1: np.ndarray, image_2: np.ndarray) -> tuple[float, np.ndarray]:
+def compute_ssim_memory_efficient(
+    image_1: np.ndarray, image_2: np.ndarray
+) -> tuple[float, np.ndarray]:
     """
     Memory-efficient SSIM computation using memory mapping.
     """
     # Create temporary memory-mapped arrays
     with NamedTemporaryFile() as tmp1, NamedTemporaryFile() as tmp2:
         # Use memory mapping to handle large arrays
-        img1_mmap = np.memmap(tmp1.name, dtype=np.float32, mode='w+', shape=image_1.shape)
-        img2_mmap = np.memmap(tmp2.name, dtype=np.float32, mode='w+', shape=image_2.shape)
-        
+        img1_mmap = np.memmap(
+            tmp1.name, dtype=np.float32, mode="w+", shape=image_1.shape
+        )
+        img2_mmap = np.memmap(
+            tmp2.name, dtype=np.float32, mode="w+", shape=image_2.shape
+        )
+
         img1_mmap[:] = image_1.astype(np.float32)
         img2_mmap[:] = image_2.astype(np.float32)
-        
+
         (score, diff) = ssim(img1_mmap, img2_mmap, full=True, data_range=255.0)
         return score, diff
 
