@@ -14,7 +14,7 @@ from app import app
 client = TestClient(app)
 
 
-def create_test_image(width=100, height=100, color=(255, 255, 255)):
+def create_test_image(width=100, height=100, color=(255, 255, 255)) -> io.BytesIO:
     """Create a test image in memory."""
     image = Image.new("RGB", (width, height), color)
     img_bytes = io.BytesIO()
@@ -26,14 +26,14 @@ def create_test_image(width=100, height=100, color=(255, 255, 255)):
 class TestHealthEndpoints:
     """Test health and basic endpoints."""
 
-    def test_root_endpoint(self):
+    def test_root_endpoint(self) -> None:
         """Test the root endpoint serves the frontend."""
         response = client.get("/")
         assert response.status_code == 200
         # Should serve HTML content
         assert "text/html" in response.headers.get("content-type", "")
 
-    def test_health_endpoint(self):
+    def test_health_endpoint(self) -> None:
         """Test the health check endpoint."""
         response = client.get("/health")
         assert response.status_code == 200
@@ -45,7 +45,7 @@ class TestHealthEndpoints:
 class TestImageComparisonAPI:
     """Test the image comparison API endpoint."""
 
-    def test_compare_images_success(self):
+    def test_compare_images_success(self) -> None:
         """Test successful image comparison."""
         # Create two slightly different test images
         ref_image = create_test_image(100, 100, (255, 255, 255))  # White
@@ -79,7 +79,7 @@ class TestImageComparisonAPI:
         assert isinstance(data["similarity_score"], float)
         assert 0 <= data["similarity_score"] <= 1
 
-    def test_compare_images_missing_reference(self):
+    def test_compare_images_missing_reference(self) -> None:
         """Test error when reference image is missing."""
         comp_image = create_test_image()
 
@@ -90,7 +90,7 @@ class TestImageComparisonAPI:
 
         assert response.status_code == 422  # Validation error
 
-    def test_compare_images_missing_compare(self):
+    def test_compare_images_missing_compare(self) -> None:
         """Test error when compare image is missing."""
         ref_image = create_test_image()
 
@@ -101,7 +101,7 @@ class TestImageComparisonAPI:
 
         assert response.status_code == 422  # Validation error
 
-    def test_compare_images_invalid_file_type(self):
+    def test_compare_images_invalid_file_type(self) -> None:
         """Test error with invalid file type."""
         # Create a text file instead of image
         text_file = io.BytesIO(b"This is not an image")
@@ -118,7 +118,7 @@ class TestImageComparisonAPI:
         data = response.json()
         assert "must be JPEG or PNG" in data["detail"]
 
-    def test_compare_images_invalid_image_data(self):
+    def test_compare_images_invalid_image_data(self) -> None:
         """Test error with corrupted image data."""
         # Create invalid image data
         invalid_data = io.BytesIO(b"Not a valid image file content")
@@ -135,7 +135,7 @@ class TestImageComparisonAPI:
         data = response.json()
         assert "Invalid" in data["detail"]
 
-    def test_compare_images_large_file(self):
+    def test_compare_images_large_file(self) -> None:
         """Test error with file too large."""
         # Create a large image (this is a mock test - in reality we'd need a very large file)
         large_image = create_test_image(
@@ -159,7 +159,7 @@ class TestImageComparisonAPI:
 class TestResultsEndpoint:
     """Test the results file serving endpoint."""
 
-    def test_get_nonexistent_result(self):
+    def test_get_nonexistent_result(self) -> None:
         """Test 404 for non-existent result file."""
         response = client.get("/results/nonexistent.jpg")
         assert response.status_code == 404
@@ -168,7 +168,7 @@ class TestResultsEndpoint:
 
 
 @pytest.fixture
-def temp_results_dir():
+def temp_results_dir() -> None:
     """Create a temporary results directory for testing."""
     with tempfile.TemporaryDirectory() as temp_dir:
         # Create a test result file
