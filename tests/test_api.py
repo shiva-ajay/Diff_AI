@@ -15,7 +15,9 @@ from app import app
 client = TestClient(app)
 
 
-def create_test_image(width: int = 100, height: int = 100, color: Tuple[int, int, int] = (255, 255, 255)) -> io.BytesIO:
+def create_test_image(
+    width: int = 100, height: int = 100, color: Tuple[int, int, int] = (255, 255, 255)
+) -> io.BytesIO:
     """Create a test image in memory."""
     image = Image.new("RGB", (width, height), color)
     img_bytes = io.BytesIO()
