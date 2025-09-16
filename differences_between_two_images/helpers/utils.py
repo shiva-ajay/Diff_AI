@@ -8,6 +8,7 @@ import cv2
 from dynaconf import settings
 from skimage.metrics import structural_similarity as ssim
 from differences_between_two_images import logging
+from tempfile import NamedTemporaryFile
 
 
 logger = logging.getLogger(__name__)
@@ -110,6 +111,23 @@ def compute_ssim(image_1: np.ndarray, image_2: np.ndarray) -> tuple[float, np.nd
     """
     (score, diff) = ssim(image_1, image_2, full=True)
     return score, diff
+
+
+def compute_ssim_memory_efficient(image_1: np.ndarray, image_2: np.ndarray) -> tuple[float, np.ndarray]:
+    """
+    Memory-efficient SSIM computation using memory mapping.
+    """
+    # Create temporary memory-mapped arrays
+    with NamedTemporaryFile() as tmp1, NamedTemporaryFile() as tmp2:
+        # Use memory mapping to handle large arrays
+        img1_mmap = np.memmap(tmp1.name, dtype=np.float32, mode='w+', shape=image_1.shape)
+        img2_mmap = np.memmap(tmp2.name, dtype=np.float32, mode='w+', shape=image_2.shape)
+        
+        img1_mmap[:] = image_1.astype(np.float32)
+        img2_mmap[:] = image_2.astype(np.float32)
+        
+        (score, diff) = ssim(img1_mmap, img2_mmap, full=True, data_range=255.0)
+        return score, diff
 
 
 def convert_image_to_8bit(image: np.ndarray) -> np.ndarray:

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P&ID Diff Finder - Dark Edition</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <h1 class="title">
+            <i class="fas fa-search-plus"></i>
+            P&ID Diff Finder
+          </h1>
+          <p class="subtitle">
+            Compare images and pinpoint differences using advanced computer
+            vision
+          </p>
+        </div>
+      </header>
+
+      <!-- Upload Section -->
+      <section class="upload-section">
+        <div class="upload-grid">
+          <!-- Reference Image Upload -->
+          <div class="upload-area" id="referenceUpload">
+            <input type="file" id="referenceFile" accept="image/*" hidden />
+            <div class="upload-content">
+              <i class="fas fa-cloud-upload-alt upload-icon"></i>
+              <h3>Reference Image</h3>
+              <p>Drag and drop or click to select</p>
+              <span class="file-types">JPEG, PNG (Max 10MB)</span>
+            </div>
+            <div class="upload-preview" style="display: none">
+              <img id="referenceImg" alt="Reference preview" />
+              <div class="preview-info">
+                <span id="referenceName" class="file-name"></span>
+                <button
+                  type="button"
+                  class="remove-btn"
+                  onclick="removeFile('reference')"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Compare Image Upload -->
+          <div class="upload-area" id="compareUpload">
+            <input type="file" id="compareFile" accept="image/*" hidden />
+            <div class="upload-content">
+              <i class="fas fa-cloud-upload-alt upload-icon"></i>
+              <h3>Compare Image</h3>
+              <p>Drag and drop or click to select</p>
+              <span class="file-types">JPEG, PNG (Max 10MB)</span>
+            </div>
+            <div class="upload-preview" style="display: none">
+              <img id="compareImg" alt="Compare preview" />
+              <div class="preview-info">
+                <span id="compareName" class="file-name"></span>
+                <button
+                  type="button"
+                  class="remove-btn"
+                  onclick="removeFile('compare')"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Find Differences Button -->
+        <div class="action-section">
+          <button id="findDifferencesBtn" class="find-btn" disabled>
+            <i class="fas fa-search"></i>
+            Find Differences
+          </button>
+        </div>
+      </section>
+
+      <!-- Progress Section -->
+      <section
+        id="progressSection"
+        class="progress-section"
+        style="display: none"
+      >
+        <div class="progress-container">
+          <div class="progress-header">
+            <i class="fas fa-cog fa-spin"></i>
+            <h3>Processing Images</h3>
+          </div>
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <p id="progressText" class="progress-text">Initializing...</p>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section
+        id="resultsSection"
+        class="results-section"
+        style="display: none"
+      >
+        <div class="results-header">
+          <h2>Analysis Results</h2>
+          <div class="similarity-score">
+            <span class="score-label">Similarity Score:</span>
+            <span id="scoreValue" class="score-value">--</span>
+          </div>
+        </div>
+
+        <div class="results-grid">
+          <!-- SSIM Difference -->
+          <div class="result-card">
+            <div class="result-image-container" onclick="openModal('ssim')">
+              <img id="ssimResult" alt="SSIM Difference" class="result-image" />
+              <div class="result-overlay">
+                <i class="fas fa-expand-alt"></i>
+              </div>
+            </div>
+            <div class="result-info">
+              <h4>SSIM Difference</h4>
+              <p>Structural similarity analysis</p>
+              <button
+                class="download-btn"
+                onclick="downloadImage('ssim', 'SSIM_Difference')"
+              >
+                <i class="fas fa-download"></i> Download
+              </button>
+            </div>
+          </div>
+
+          <!-- Bounded Differences -->
+          <div class="result-card">
+            <div class="result-image-container" onclick="openModal('bounded')">
+              <img
+                id="boundedResult"
+                alt="Bounded Differences"
+                class="result-image"
+              />
+              <div class="result-overlay">
+                <i class="fas fa-expand-alt"></i>
+              </div>
+            </div>
+            <div class="result-info">
+              <h4>Bounded Differences</h4>
+              <p>Differences highlighted with rectangles</p>
+              <button
+                class="download-btn"
+                onclick="downloadImage('bounded', 'Bounded_Differences')"
+              >
+                <i class="fas fa-download"></i> Download
+              </button>
+            </div>
+          </div>
+
+          <!-- Drawn Differences -->
+          <div class="result-card">
+            <div class="result-image-container" onclick="openModal('drawn')">
+              <img
+                id="drawnResult"
+                alt="Drawn Differences"
+                class="result-image"
+              />
+              <div class="result-overlay">
+                <i class="fas fa-expand-alt"></i>
+              </div>
+            </div>
+            <div class="result-info">
+              <h4>Drawn Differences</h4>
+              <p>Differences filled and highlighted</p>
+              <button
+                class="download-btn"
+                onclick="downloadImage('drawn', 'Drawn_Differences')"
+              >
+                <i class="fas fa-download"></i> Download
+              </button>
+            </div>
+          </div>
+
+          <!-- Mask Differences -->
+          <div class="result-card">
+            <div class="result-image-container" onclick="openModal('mask')">
+              <img
+                id="maskResult"
+                alt="Mask Differences"
+                class="result-image"
+              />
+              <div class="result-overlay">
+                <i class="fas fa-expand-alt"></i>
+              </div>
+            </div>
+            <div class="result-info">
+              <h4>Mask Differences</h4>
+              <p>Binary mask of differences</p>
+              <button
+                class="download-btn"
+                onclick="downloadImage('mask', 'Mask_Differences')"
+              >
+                <i class="fas fa-download"></i> Download
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 id="modalTitle">Image Preview</h3>
+          <div class="modal-controls">
+            <button
+              class="modal-control-btn"
+              onclick="zoomIn()"
+              title="Zoom In"
+            >
+              <i class="fas fa-search-plus"></i>
+            </button>
+            <button
+              class="modal-control-btn"
+              onclick="zoomOut()"
+              title="Zoom Out"
+            >
+              <i class="fas fa-search-minus"></i>
+            </button>
+            <button
+              class="modal-control-btn"
+              onclick="resetZoom()"
+              title="Reset View"
+            >
+              <i class="fas fa-expand-arrows-alt"></i>
+            </button>
+            <button
+              class="modal-control-btn"
+              onclick="downloadModalImage()"
+              title="Download Image"
+            >
+              <i class="fas fa-download"></i>
+            </button>
+            <button class="modal-close" onclick="closeModal()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <div class="image-container" id="imageContainer">
+            <img id="modalImage" alt="Full size preview" draggable="false" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="errorToast" class="toast error-toast">
+      <div class="toast-content">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorMessage">An error occurred</span>
+      </div>
+      <button
+        class="toast-close"
+        onclick="document.getElementById('errorToast').classList.remove('show')"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <script src="/static/script.js"></script>
+  </body>
+</html>
