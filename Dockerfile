@@ -23,8 +23,15 @@ RUN poetry config virtualenvs.create false
 # Install project dependencies
 RUN poetry install --only main --no-interaction --no-ansi
 
+# Install curl for healthcheck
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Expose the port the app runs on
 EXPOSE 8000
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/ || exit 1
 
 # Command to run the application
 CMD ["poetry", "run", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
