@@ -8,13 +8,14 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 from PIL import Image
 import io
+from typing import Generator, Tuple
 
 from app import app
 
 client = TestClient(app)
 
 
-def create_test_image(width=100, height=100, color=(255, 255, 255)) -> io.BytesIO:
+def create_test_image(width: int = 100, height: int = 100, color: Tuple[int, int, int] = (255, 255, 255)) -> io.BytesIO:
     """Create a test image in memory."""
     image = Image.new("RGB", (width, height), color)
     img_bytes = io.BytesIO()
@@ -168,7 +169,7 @@ class TestResultsEndpoint:
 
 
 @pytest.fixture
-def temp_results_dir() -> None:
+def temp_results_dir() -> Generator[str, None, None]:
     """Create a temporary results directory for testing."""
     with tempfile.TemporaryDirectory() as temp_dir:
         # Create a test result file
